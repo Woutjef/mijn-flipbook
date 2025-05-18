@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Familie Senders – Stamboomboek</title>
+  <style>
+    body {
+      background: #eee;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px 0 10px 0;
+      font-weight: normal;
+      font-size: 2rem;
+    }
+
+    #flipbook {
+      width: 960px;
+      height: 640px;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      border-radius: 12px;
+      background: white;
+      overflow: hidden;
+    }
+
+    .page {
+      width: 480px;
+      height: 640px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: white;
+    }
+
+    .page img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    #controls {
+      text-align: center;
+      margin: 20px 0 30px 0;
+    }
+
+    #controls button {
+      background-color: #007acc;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      margin: 0 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #controls button:hover {
+      background-color: #005fa3;
+    }
+
+    #controls input[type="number"] {
+      padding: 10px;
+      font-size: 1rem;
+      width: 80px;
+      margin-left: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      text-align: center;
+    }
+  </style>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Lokale Turn.js -->
+  <script src="turn.min.js"></script>
+</head>
+<body>
+  <h1>Stamboomboek Familie Senders</h1>
+
+  <div id="flipbook"></div>
+
+  <div id="controls">
+    <button onclick="$('#flipbook').turn('page', 1)">⏮️ Terug naar begin</button>
+    <button onclick="document.documentElement.requestFullscreen()">🖥️ Volledig scherm</button>
+
+    <label for="pageSearch">🔍 Ga naar pagina:</label>
+    <input type="number" id="pageSearch" min="1" max="547" />
+    <button onclick="goToPage()">Ga</button>
+  </div>
+
+  <!-- Geluidselement -->
+  <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
+
+  <script>
+    const totalPages = 547;
+    let soundActivated = false;
+
+    function playPageSound() {
+      const sound = document.getElementById("pageSound");
+      if (!soundActivated) return;
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function activateSound() {
+      const sound = document.getElementById("pageSound");
+      sound.volume = 0;
+      sound.play().then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+        sound.volume = 1;
+        soundActivated = true;
+      }).catch(() => {
+        // sommige browsers blokkeren autoplay
+      });
+    }
+
+    function goToPage() {
+      const pageInput = document.getElementById("pageSearch");
+      const page = parseInt(pageInput.value);
+      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+        $('#flipbook').turn('page', page);
+        playPageSound();
+      }
+    }
+
+    $(document).ready(function () {
+      // Activeer geluid na eerste klik of toets
+      $(document).one("click keydown", function () {
+        activateSound();
+      });
+
+      // Voeg pagina-afbeeldingen toe
+      for (let i = 1; i <= totalPages; i++) {
+        const pageNum = String(i).padStart(3, '0');
+        const pageDiv = $('<div>').addClass('page');
+        const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
+        pageDiv.append(img);
+        $('#flipbook').append(pageDiv);
+      }
+
+      // Initialiseer flipbook
+      $('#flipbook').turn({
+        width: 960,
+        height: 640,
+        autoCenter: true,
+        when: {
+          turning: function () {
+            setTimeout(playPageSound, 100);
+          }
+        }
+      });
+
+      // Pijltjestoetsen
+      $(document).keydown(function(e) {
+        const flipbook = $('#flipbook');
+        switch (e.key) {
+          case "ArrowLeft":
+            setTimeout(() => {
+              flipbook.turn('previous');
+            }, 50);
+            e.preventDefault();
+            break;
+          case "ArrowRight":
+            setTimeout(() => {
+              flipbook.turn('next');
+            }, 50);
+            e.preventDefault();
+            break;
+        }
+      });
+
+      // Enter activeert zoekveld
+      $('#pageSearch').on('keypress', function (e) {
+        if (e.key === 'Enter') {
+          goToPage();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
