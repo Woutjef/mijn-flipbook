@@ -1,192 +1,236 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Familie Senders – Stamboomboek</title>
-  <style>
-    body {
-      background: #eee;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      color: #333;
-    }
+    <meta charset="utf-8" />
+    <title>Familie Senders – Stamboomboek</title>
+    <style>
+        body {
+            background: #eee;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
 
-    h1 {
-      text-align: center;
-      margin: 20px 0 10px 0;
-      font-weight: normal;
-      font-size: 2rem;
-    }
+        h1 {
+            text-align: center;
+            margin: 20px 0 10px 0;
+            font-weight: normal;
+            font-size: 2rem;
+        }
 
-    #flipbook {
-      width: 960px;
-      height: 640px;
-      margin: 0 auto 20px auto;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-      border-radius: 12px;
-      background: white;
-      overflow: hidden;
-    }
+        #main-container { /* Flex-container voor pijltjes en flipbook */
+            display: flex;
+            justify-content: center; /* Centreert de items (pijlen + flipbook) horizontaal */
+            align-items: center; /* Centreert de items verticaal */
+            margin: 0 auto 20px auto; /* Centreert de hele container */
+            /* width: fit-content; is niet meer nodig hier, breedte wordt bepaald door inhoud */
+        }
 
-    .page {
-      width: 480px;
-      height: 640px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      border-radius: 8px;
-      overflow: hidden;
-      background-color: white;
-    }
+        #flipbook {
+            width: 960px; /* Breedte van twee pagina's */
+            height: 640px; /* Hoogte van een pagina */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            background: white;
+            overflow: hidden;
+        }
 
-    .page img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
+        .page {
+            width: 480px; /* Breedte van één pagina */
+            height: 640px; /* Hoogte van één pagina */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Optioneel: schaduw per pagina */
+            border-radius: 8px; /* Optioneel: afgeronde hoeken per pagina */
+            overflow: hidden;
+            background-color: white;
+        }
 
-    #controls {
-      text-align: center;
-      margin: 20px 0 30px 0;
-    }
+        .page img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
 
-    #controls button {
-      background-color: #007acc;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      margin: 0 10px;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+        .nav-arrow-outside {
+            background-color: rgba(0, 0, 0, 0.4); /* Transparanter, minder prominent dan controls */
+            border: none;
+            color: white;
+            padding: 20px 25px;
+            font-size: 3rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            height: 100px; /* Vaste hoogte voor de knoppen */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Géén vaste margin hier, we gebruiken flexbox gap of padding */
+        }
 
-    #controls button:hover {
-      background-color: #005fa3;
-    }
+        .nav-arrow-outside:hover {
+            background-color: rgba(0, 0, 0, 0.7); /* Donkerder bij hover */
+        }
 
-    #controls input[type="number"] {
-      padding: 10px;
-      font-size: 1rem;
-      width: 80px;
-      margin-left: 10px;
-      border-radius: 5px;
-      border: 1px solid #aaa;
-      text-align: center;
-    }
-  </style>
+        #arrow-left {
+            margin-right: 20px; /* Afstand tussen linkerpijl en flipbook */
+        }
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        #arrow-right {
+            margin-left: 20px; /* Afstand tussen rechterpijl en flipbook */
+        }
 
-  <!-- Lokale Turn.js -->
-  <script src="turn.min.js"></script>
+        #controls {
+            text-align: center;
+            margin: 20px 0 30px 0;
+        }
+
+        #controls button {
+            background-color: #007acc;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 0 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #controls button:hover {
+            background-color: #005fa3;
+        }
+
+        #controls input[type="number"] {
+            padding: 10px;
+            font-size: 1rem;
+            width: 80px;
+            margin-left: 10px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            text-align: center;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="turn.min.js"></script>
 </head>
 <body>
-  <h1>Stamboomboek Familie Senders</h1>
+    <h1>Stamboomboek Familie Senders</h1>
 
-  <div id="flipbook"></div>
+    <div id="main-container">
+        <button id="arrow-left" class="nav-arrow-outside">←</button>
+        <div id="flipbook"></div>
+        <button id="arrow-right" class="nav-arrow-outside">→</button>
+    </div>
 
-  <div id="controls">
-    <button onclick="$('#flipbook').turn('page', 1)">⏮️ Terug naar begin</button>
-    <button onclick="document.documentElement.requestFullscreen()">🖥️ Volledig scherm</button>
+    <div id="controls">
+        <button onclick="$('#flipbook').turn('page', 1)">⏮️ Terug naar begin</button>
+        <button onclick="document.documentElement.requestFullscreen()">🖥️ Volledig scherm</button>
 
-    <label for="pageSearch">🔍 Ga naar pagina:</label>
-    <input type="number" id="pageSearch" min="1" max="547" />
-    <button onclick="goToPage()">Ga</button>
-  </div>
+        <label for="pageSearch">🔍 Ga naar pagina:</label>
+        <input type="number" id="pageSearch" min="1" max="547" />
+        <button onclick="goToPage()">Ga</button>
+    </div>
 
-  <!-- Geluidselement -->
-  <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
+    <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
 
-  <script>
-    const totalPages = 547;
-    let soundActivated = false;
+    <script>
+        const totalPages = 547;
+        let soundActivated = false;
 
-    function playPageSound() {
-      const sound = document.getElementById("pageSound");
-      if (!soundActivated) return;
-      sound.currentTime = 0;
-      sound.play();
-    }
-
-    function activateSound() {
-      const sound = document.getElementById("pageSound");
-      sound.volume = 0;
-      sound.play().then(() => {
-        sound.pause();
-        sound.currentTime = 0;
-        sound.volume = 1;
-        soundActivated = true;
-      }).catch(() => {
-        // sommige browsers blokkeren autoplay
-      });
-    }
-
-    function goToPage() {
-      const pageInput = document.getElementById("pageSearch");
-      const page = parseInt(pageInput.value);
-      if (!isNaN(page) && page >= 1 && page <= totalPages) {
-        $('#flipbook').turn('page', page);
-        playPageSound();
-      }
-    }
-
-    $(document).ready(function () {
-      // Activeer geluid na eerste klik of toets
-      $(document).one("click keydown", function () {
-        activateSound();
-      });
-
-      // Voeg pagina-afbeeldingen toe
-      for (let i = 1; i <= totalPages; i++) {
-        const pageNum = String(i).padStart(3, '0');
-        const pageDiv = $('<div>').addClass('page');
-        const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
-        pageDiv.append(img);
-        $('#flipbook').append(pageDiv);
-      }
-
-      // Initialiseer flipbook
-      $('#flipbook').turn({
-        width: 960,
-        height: 640,
-        autoCenter: true,
-        when: {
-          turning: function () {
-            setTimeout(playPageSound, 100);
-          }
+        function playPageSound() {
+            const sound = document.getElementById("pageSound");
+            if (!soundActivated) return;
+            sound.currentTime = 0;
+            sound.play();
         }
-      });
 
-      // Pijltjestoetsen
-      $(document).keydown(function(e) {
-        const flipbook = $('#flipbook');
-        switch (e.key) {
-          case "ArrowLeft":
-            setTimeout(() => {
-              flipbook.turn('previous');
-            }, 50);
-            e.preventDefault();
-            break;
-          case "ArrowRight":
-            setTimeout(() => {
-              flipbook.turn('next');
-            }, 50);
-            e.preventDefault();
-            break;
+        function activateSound() {
+            const sound = document.getElementById("pageSound");
+            sound.volume = 0;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = 1;
+                soundActivated = true;
+            }).catch(() => {
+                // sommige browsers blokkeren autoplay
+            });
         }
-      });
 
-      // Enter activeert zoekveld
-      $('#pageSearch').on('keypress', function (e) {
-        if (e.key === 'Enter') {
-          goToPage();
+        function goToPage() {
+            const pageInput = document.getElementById("pageSearch");
+            const page = parseInt(pageInput.value);
+            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                $('#flipbook').turn('page', page);
+                playPageSound();
+            }
         }
-      });
-    });
-  </script>
+
+        $(document).ready(function () {
+            // Activeer geluid na eerste klik of toets
+            $(document).one("click keydown", function () {
+                activateSound();
+            });
+
+            // Voeg pagina-afbeeldingen toe
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNum = String(i).padStart(3, '0');
+                const pageDiv = $('<div>').addClass('page');
+                const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
+                pageDiv.append(img);
+                $('#flipbook').append(pageDiv);
+            }
+
+            // Initialiseer flipbook
+            $('#flipbook').turn({
+                width: 960,
+                height: 640,
+                autoCenter: true,
+                when: {
+                    turning: function () {
+                        setTimeout(playPageSound, 100);
+                    }
+                }
+            });
+
+            // Pijltjestoetsen
+            $(document).keydown(function(e) {
+                const flipbook = $('#flipbook');
+                switch (e.key) {
+                    case "ArrowLeft":
+                        setTimeout(() => {
+                            flipbook.turn('previous');
+                        }, 50);
+                        e.preventDefault();
+                        break;
+                    case "ArrowRight":
+                        setTimeout(() => {
+                            flipbook.turn('next');
+                        }, 50);
+                        e.preventDefault();
+                        break;
+                }
+            });
+
+            // Enter activeert zoekveld
+            $('#pageSearch').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    goToPage();
+                }
+            });
+
+            // Klik op pijltjes
+            $('#arrow-left').on('click', function() {
+                $('#flipbook').turn('previous');
+            });
+
+            $('#arrow-right').on('click', function() {
+                $('#flipbook').turn('next');
+            });
+        });
+    </script>
 </body>
 </html>
-
