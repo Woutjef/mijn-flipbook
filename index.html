@@ -37,8 +37,7 @@
         }
 
         .page {
-            width: 480px; /* Breedte van één pagina */
-            height: 640px; /* Hoogte van één pagina */
+            /* Turn.js beheert de breedte en hoogte van .page op basis van #flipbook grootte */
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             border-radius: 8px;
             overflow: hidden;
@@ -54,15 +53,15 @@
         }
 
         .nav-arrow-outside {
-            background-color: rgba(0, 0, 0, 0.1); /* Meer transparant */
+            background-color: rgba(0, 0, 0, 0.1);
             border: none;
             color: white;
-            padding: 5px 8px; /* Ongeveer 50% kleiner padding */
-            font-size: 1.2rem; /* Ongeveer 50% kleiner font-size */
+            padding: 5px 8px;
+            font-size: 1.2rem;
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            height: 30px; /* Ongeveer 50% kleiner hoogte */
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -70,20 +69,20 @@
         }
 
         .nav-arrow-outside:hover {
-            background-color: rgba(0, 0, 0, 0.4); /* Donkerder bij hover */
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         #arrow-left {
-            margin-right: 10px; /* Afstand tussen linkerpijl en flipbook */
+            margin-right: 10px;
         }
 
         #arrow-right {
-            margin-left: 10px; /* Afstand tussen rechterpijl en flipbook */
+            margin-left: 10px;
         }
 
         #controls {
             text-align: center;
-            margin: 20px 0 30px 0;
+            margin: 20px 0 15px 0; /* Minder marge onder de controls */
             transition: margin 0.3s ease;
         }
 
@@ -91,10 +90,10 @@
             background-color: #007acc;
             border: none;
             color: white;
-            padding: 12px 20px;
-            margin: 0 10px;
-            font-size: 1rem;
-            border-radius: 6px;
+            padding: 6px 10px; /* Ongeveer 50% kleiner (was 12px 20px) */
+            margin: 0 5px; /* Ongeveer 50% kleiner (was 0 10px) */
+            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
+            border-radius: 4px; /* Iets kleinere radius */
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -103,35 +102,40 @@
             background-color: #005fa3;
         }
 
+        #controls label {
+            font-size: 0.8rem; /* Tekst bij input ook kleiner */
+        }
+
         #controls input[type="number"] {
-            padding: 10px;
-            font-size: 1rem;
-            width: 80px;
-            margin-left: 10px;
-            border-radius: 5px;
+            padding: 5px; /* Ongeveer 50% kleiner (was 10px) */
+            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
+            width: 60px; /* Kleinere breedte (was 80px) */
+            margin-left: 5px; /* Kleinere marge */
+            border-radius: 3px; /* Kleinere radius */
             border: 1px solid #aaa;
             text-align: center;
         }
 
         #download-section {
             text-align: center;
-            margin-top: 10px;
-            font-size: 0.85rem; /* Kleinere tekst voor instructie */
-            color: #666; /* Lichtere kleur voor instructie */
+            margin-top: 5px; /* Minder marge boven de download sectie */
+            margin-bottom: 20px; /* Marge onderaan de download sectie */
+            font-size: 0.75rem; /* Nog kleiner voor instructie */
+            color: #666;
         }
 
         #download-section a {
-            background-color: #28a745; /* Groen voor download */
+            background-color: #28a745;
             border: none;
             color: white;
-            padding: 10px 15px;
-            font-size: 1rem;
-            border-radius: 6px;
+            padding: 8px 12px; /* Ongeveer 50% kleiner (was 10px 15px) */
+            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            text-decoration: none; /* Geen onderstreping */
-            display: inline-block; /* Zodat padding werkt */
-            margin-top: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 3px; /* Kleinere marge */
         }
 
         #download-section a:hover {
@@ -140,18 +144,33 @@
 
         /* Fullscreen-achtige modus styles */
         body.fullscreen-mode #main-container {
-            margin: 0 auto;
+            margin-top: 10px; /* Houd enige marge bovenaan */
+            margin-bottom: 10px; /* Houd enige marge onderaan */
             width: 100%;
-            height: calc(100vh - 120px); /* Meer ruimte voor header/footer */
+            height: auto; /* Laat hoogte bepalen door content na schaling */
             max-width: 100%;
         }
 
         body.fullscreen-mode #flipbook {
-            width: auto;
-            height: calc(100vh - 180px); /* Vulling voor header/footer/controls */
-            max-height: 85vh;
-            max-width: calc(85vh * 1.5); /* Ratio 960/640 = 1.5 */
+            /* De Turn.js 'size' methode past de width en height van #flipbook direct aan,
+               dus deze CSS dient voornamelijk als fallback/default styling voor die modus. */
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        body.fullscreen-mode h1 {
+            display: none; /* Verberg de titel in fullscreen mode */
+        }
+
+        /* Responsive aanpassingen voor kleine schermen in fullscreen mode */
+        @media (max-width: 1200px) { /* Pas aan voor schermen waar het boek normaal breed is */
+            body.fullscreen-mode #main-container {
+                height: calc(100vh - 120px); /* Meer ruimte voor controls/footer */
+            }
+        }
+        @media (max-height: 800px) { /* Aanpassing voor kleinere hoogtes */
+             body.fullscreen-mode #main-container {
+                height: calc(100vh - 100px);
+            }
         }
     </style>
 
@@ -211,77 +230,85 @@
                 sound.volume = 1;
                 soundActivated = true;
             }).catch(() => {
-                // sommige browsers blokkeren autoplay
                 console.warn("Autoplay van geluid geblokkeerd. Geluid wordt mogelijk niet afgespeeld tenzij de gebruiker interactie heeft gehad.");
             });
         }
 
-        // Functie om de "volledig scherm" modus te togglen
-        function toggleFullscreenLayout() {
-            // Als we al in fullscreen mode zijn en deze functie wordt handmatig aangeroepen (niet door omslaan),
-            // dan toggelen we het uit. Anders zetten we het altijd aan.
-            const shouldToggleOff = isFullscreenMode && event && event.type === 'click' && event.currentTarget.id === 'toggleFullscreen';
-
-            if (shouldToggleOff) {
-                isFullscreenMode = false;
-            } else {
-                isFullscreenMode = true;
+        function goToPage() {
+            const pageInput = document.getElementById("pageSearch");
+            const page = parseInt(pageInput.value);
+            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                $('#flipbook').turn('page', page);
             }
+        }
 
-            $('body').toggleClass('fullscreen-mode', isFullscreenMode);
-
+        // Functie om de "volledig scherm" modus te togglen
+        function toggleFullscreenLayout(triggeredByClick = false) {
             const flipbook = $('#flipbook');
             const mainContainer = $('#main-container');
             const header = $('h1');
             const controls = $('#controls');
-            const downloadSection = $('#download-section'); // De nieuwe download sectie
+            const downloadSection = $('#download-section');
+
+            // Bepaal of we de modus UIT moeten zetten
+            if (triggeredByClick && isFullscreenMode) {
+                isFullscreenMode = false;
+            } else if (!isFullscreenMode) { // Anders, zet AAN als het nog niet aanstaat
+                isFullscreenMode = true;
+            } else { // Als het al aanstaat en niet door een klik wordt uitgeschakeld, doe niets
+                return;
+            }
+
+            $('body').toggleClass('fullscreen-mode', isFullscreenMode);
 
             if (isFullscreenMode) {
-                // Bereken beschikbare ruimte en schaal het flipbook
+                // Bereken beschikbare ruimte
                 const viewportWidth = $(window).width();
                 const viewportHeight = $(window).height();
 
-                // Hoogte van header en controls (inclusief marges)
-                const headerHeight = header.is(':visible') ? header.outerHeight(true) : 0;
-                const controlsHeight = controls.outerHeight(true);
-                const downloadHeight = downloadSection.outerHeight(true); // Hoogte van download sectie
-                
-                // Totale verticale ruimte die door elementen ingenomen wordt, excl. flipbook
-                const occupiedVerticalSpace = headerHeight + controlsHeight + downloadHeight + 40; // Extra marge/padding
+                // Hoogte van zichtbare besturingselementen
+                const currentHeaderHeight = header.is(':visible') ? header.outerHeight(true) : 0;
+                const currentControlsHeight = controls.outerHeight(true);
+                const currentDownloadHeight = downloadSection.outerHeight(true);
 
-                const availableHeight = viewportHeight - occupiedVerticalSpace;
+                // Ruimte voor marges en padding, en om te voorkomen dat het te krap wordt
+                const verticalBuffer = 60; // Extra ruimte boven/onder
+                const horizontalBuffer = 40; // Extra ruimte links/rechts voor pijlen + marge
+
+                const availableHeight = viewportHeight - (currentHeaderHeight + currentControlsHeight + currentDownloadHeight + verticalBuffer);
+                const availableWidth = viewportWidth - horizontalBuffer;
 
                 const originalRatio = defaultFlipbookWidth / defaultFlipbookHeight;
 
-                let newFlipbookHeight = availableHeight;
-                let newFlipbookWidth = newFlipbookHeight * originalRatio;
+                let newFlipbookWidth, newFlipbookHeight;
 
-                // Als de berekende breedte te groot is voor de viewport, schaal dan op basis van breedte
-                const horizontalPaddingForArrows = 200; // Ruimte voor pijlen en marges
-                if (newFlipbookWidth > viewportWidth - horizontalPaddingForArrows) {
-                    newFlipbookWidth = viewportWidth - horizontalPaddingForArrows;
+                // Bereken de nieuwe grootte op basis van de beschikbare ruimte en de ratio
+                // Prioriteer de hoogte om de hele pagina te vullen
+                newFlipbookHeight = availableHeight;
+                newFlipbookWidth = newFlipbookHeight * originalRatio;
+
+                // Als de berekende breedte te groot is voor de beschikbare breedte, schaal dan op basis van breedte
+                if (newFlipbookWidth > availableWidth) {
+                    newFlipbookWidth = availableWidth;
                     newFlipbookHeight = newFlipbookWidth / originalRatio;
                 }
 
                 // Zorg ervoor dat het niet kleiner wordt dan de standaardgrootte, tenzij de viewport echt klein is
-                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth);
-                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight);
+                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth / 2); // Kleinere minimale grootte
+                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight / 2);
 
-                // Pas de afmetingen aan (via Turn.js resize)
+                // Pas de afmetingen aan met Turn.js
                 flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
 
-                // Verander de marges van de container om het centraal te houden en strakker te zetten
-                mainContainer.css({ 'margin-top': '10px', 'margin-bottom': '10px' });
-                header.hide(); // Verberg de titel in fullscreen mode
-                // De controls blijven zichtbaar, we hoeven hun CSS niet te wijzigen via JS
+                // Optioneel: pas marges van main-container aan voor een strakker fullscreen beeld
+                mainContainer.css({ 'margin-top': 'auto', 'margin-bottom': 'auto' });
+
             } else {
                 // Terug naar standaard maten
                 flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
 
                 // Herstel marges
                 mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
-                header.show(); // Toon de titel weer
-                // Controls en download sectie herstellen hun standaard marges via CSS
             }
 
             // Zorg ervoor dat het flipbook opnieuw wordt gecentreerd na de wijziging
@@ -309,20 +336,24 @@
                 width: defaultFlipbookWidth,
                 height: defaultFlipbookHeight,
                 autoCenter: true,
-                duration: 600, // Voeg een animatie duur toe (standaard is 600ms)
+                duration: 600, // Standaard duur van de animatie
+                acceleration: true, // Gebruik hardware acceleratie voor soepelere animaties
                 when: {
                     turning: function () {
-                        // Speel geluid af direct bij het begin van de omslaganimatie
                         playPageSound();
-                        // Activeer fullscreen mode wanneer een pagina omslaat
-                        if (!isFullscreenMode) { // Alleen aanzetten als het nog niet aanstaat
-                            toggleFullscreenLayout();
+                        // Activeer fullscreen mode wanneer een pagina omslaat, tenzij het al aanstaat
+                        // of we het net hebben uitgeschakeld via de knop.
+                        if (!isFullscreenMode) {
+                            toggleFullscreenLayout(false); // false omdat het niet door een klik komt
                         }
                     },
                     turned: function(event, page, view) {
                         // Zorg ervoor dat de schaal correct is na het omslaan in fullscreen mode
                         if (isFullscreenMode) {
-                            toggleFullscreenLayout(); // Herbereken de grootte om de meest optimale fit te garanderen
+                            // setTimeout nodig om Turn.js even de tijd te geven
+                            setTimeout(() => {
+                                toggleFullscreenLayout(false);
+                            }, 50);
                         }
                     }
                 }
@@ -333,11 +364,11 @@
                 const flipbook = $('#flipbook');
                 switch (e.key) {
                     case "ArrowLeft":
-                        e.preventDefault(); // Voorkom standaard browser scrollgedrag
+                        e.preventDefault();
                         flipbook.turn('previous');
                         break;
                     case "ArrowRight":
-                        e.preventDefault(); // Voorkom standaard browser scrollgedrag
+                        e.preventDefault();
                         flipbook.turn('next');
                         break;
                 }
@@ -360,12 +391,14 @@
             });
 
             // Event listener voor de 'Volledig scherm' knop
-            $('#toggleFullscreen').on('click', toggleFullscreenLayout);
+            $('#toggleFullscreen').on('click', function() {
+                toggleFullscreenLayout(true); // true omdat het door een klik komt
+            });
 
             // Pas de grootte van het flipbook aan als het browservenster verandert
             $(window).resize(function() {
                 if (isFullscreenMode) {
-                    toggleFullscreenLayout(); // Herbereken de grootte
+                    toggleFullscreenLayout(false); // Niet door een klik, herbereken grootte
                 }
             });
         });
