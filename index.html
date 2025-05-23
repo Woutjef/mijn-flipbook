@@ -9,6 +9,8 @@
             margin: 0;
             font-family: Arial, sans-serif;
             color: #333;
+            /* Voorkom scrollbalken door overloopt bij fullscreen-mode */
+            overflow-x: hidden;
         }
 
         h1 {
@@ -24,6 +26,9 @@
             align-items: center;
             margin: 0 auto 20px auto;
             transition: margin 0.3s ease;
+            position: relative; /* Belangrijk voor centering van het flipbook in fullscreen */
+            /* Min-hoogte zodat de controls altijd passen, zelfs als het boek klein is */
+            min-height: 640px; /* Standaard flipbook hoogte */
         }
 
         #flipbook {
@@ -36,8 +41,19 @@
             transition: width 0.3s ease, height 0.3s ease;
         }
 
+        /* Verberg de lege pagina links van pagina 1 */
+        #flipbook .p1 { /* .p1 is de klasse die Turn.js toevoegt aan de eerste pagina */
+            background-color: transparent !important; /* Maak achtergrond transparant */
+            box-shadow: none !important; /* Geen schaduw */
+        }
+        /* Zorg ervoor dat de *achterkant* van de eerste pagina (die normaal links van p1 is)
+           niet zichtbaar is. Turn.js gebruikt soms de index 0 voor de achterkant van pagina 1. */
+        #flipbook div[style*="left: 0px"]:first-child:not(.p1) {
+            display: none !important;
+        }
+
+
         .page {
-            /* Turn.js beheert de breedte en hoogte van .page op basis van #flipbook grootte */
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             border-radius: 8px;
             overflow: hidden;
@@ -66,6 +82,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            user-select: none; /* Voorkom selectie van pijltekens */
         }
 
         .nav-arrow-outside:hover {
@@ -82,7 +99,7 @@
 
         #controls {
             text-align: center;
-            margin: 20px 0 15px 0; /* Minder marge onder de controls */
+            margin: 20px 0 15px 0;
             transition: margin 0.3s ease;
         }
 
@@ -90,10 +107,10 @@
             background-color: #007acc;
             border: none;
             color: white;
-            padding: 6px 10px; /* Ongeveer 50% kleiner (was 12px 20px) */
-            margin: 0 5px; /* Ongeveer 50% kleiner (was 0 10px) */
-            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
-            border-radius: 4px; /* Iets kleinere radius */
+            padding: 6px 10px;
+            margin: 0 5px;
+            font-size: 0.8rem;
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -103,24 +120,24 @@
         }
 
         #controls label {
-            font-size: 0.8rem; /* Tekst bij input ook kleiner */
+            font-size: 0.8rem;
         }
 
         #controls input[type="number"] {
-            padding: 5px; /* Ongeveer 50% kleiner (was 10px) */
-            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
-            width: 60px; /* Kleinere breedte (was 80px) */
-            margin-left: 5px; /* Kleinere marge */
-            border-radius: 3px; /* Kleinere radius */
+            padding: 5px;
+            font-size: 0.8rem;
+            width: 60px;
+            margin-left: 5px;
+            border-radius: 3px;
             border: 1px solid #aaa;
             text-align: center;
         }
 
         #download-section {
             text-align: center;
-            margin-top: 5px; /* Minder marge boven de download sectie */
-            margin-bottom: 20px; /* Marge onderaan de download sectie */
-            font-size: 0.75rem; /* Nog kleiner voor instructie */
+            margin-top: 5px;
+            margin-bottom: 20px;
+            font-size: 0.75rem;
             color: #666;
         }
 
@@ -128,14 +145,14 @@
             background-color: #28a745;
             border: none;
             color: white;
-            padding: 8px 12px; /* Ongeveer 50% kleiner (was 10px 15px) */
-            font-size: 0.8rem; /* Ongeveer 50% kleiner (was 1rem) */
+            padding: 8px 12px;
+            font-size: 0.8rem;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            margin-top: 3px; /* Kleinere marge */
+            margin-top: 3px;
         }
 
         #download-section a:hover {
@@ -143,35 +160,35 @@
         }
 
         /* Fullscreen-achtige modus styles */
-        body.fullscreen-mode #main-container {
-            margin-top: 10px; /* Houd enige marge bovenaan */
-            margin-bottom: 10px; /* Houd enige marge onderaan */
-            width: 100%;
-            height: auto; /* Laat hoogte bepalen door content na schaling */
-            max-width: 100%;
-        }
-
-        body.fullscreen-mode #flipbook {
-            /* De Turn.js 'size' methode past de width en height van #flipbook direct aan,
-               dus deze CSS dient voornamelijk als fallback/default styling voor die modus. */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        body.fullscreen-mode {
+            /* Zorgt dat de body geen extra marges of padding heeft die de berekening verstoren */
+            padding: 0;
+            margin: 0;
+            overflow-y: hidden; /* Verberg verticale scrollbalken */
         }
 
         body.fullscreen-mode h1 {
             display: none; /* Verberg de titel in fullscreen mode */
         }
 
-        /* Responsive aanpassingen voor kleine schermen in fullscreen mode */
-        @media (max-width: 1200px) { /* Pas aan voor schermen waar het boek normaal breed is */
-            body.fullscreen-mode #main-container {
-                height: calc(100vh - 120px); /* Meer ruimte voor controls/footer */
-            }
+        body.fullscreen-mode #main-container {
+            /* Maak de container zo groot mogelijk, houd rekening met controls */
+            height: calc(100vh - (var(--controls-height, 0px) + var(--download-height, 0px) + 40px)); /* Dynamische hoogte */
+            margin-top: 10px; /* Kleine marge bovenaan */
+            margin-bottom: 10px; /* Kleine marge onderaan */
         }
-        @media (max-height: 800px) { /* Aanpassing voor kleinere hoogtes */
-             body.fullscreen-mode #main-container {
-                height: calc(100vh - 100px);
-            }
+
+        body.fullscreen-mode #flipbook {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            /* De Turn.js 'size' methode past de width en height direct aan */
         }
+
+        /* CSS variabelen voor dynamische hoogtes in fullscreen mode */
+        :root {
+            --controls-height: 0px;
+            --download-height: 0px;
+        }
+
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -189,7 +206,7 @@
 
     <div id="controls">
         <button id="toggleFullscreen">🖥️ Volledig scherm</button>
-        <button onclick="$('#flipbook').turn('page', 1)">⏮️ Terug naar begin</button>
+        <button onclick="goToPage(1)">⏮️ Terug naar begin</button>
 
         <label for="pageSearch">🔍 Ga naar pagina:</label>
         <input type="number" id="pageSearch" min="1" max="547" />
@@ -223,41 +240,62 @@
 
         function activateSound() {
             const sound = document.getElementById("pageSound");
-            sound.volume = 0;
+            sound.volume = 0; // Zet volume op 0 om geluid te 'laden'
             sound.play().then(() => {
-                sound.pause();
-                sound.currentTime = 0;
-                sound.volume = 1;
+                sound.pause(); // Pauzeer direct
+                sound.currentTime = 0; // Reset
+                sound.volume = 1; // Zet volume terug op 1
                 soundActivated = true;
             }).catch(() => {
                 console.warn("Autoplay van geluid geblokkeerd. Geluid wordt mogelijk niet afgespeeld tenzij de gebruiker interactie heeft gehad.");
             });
         }
 
-        function goToPage() {
-            const pageInput = document.getElementById("pageSearch");
-            const page = parseInt(pageInput.value);
-            if (!isNaN(page) && page >= 1 && page <= totalPages) {
-                $('#flipbook').turn('page', page);
+        // Aangepaste goToPage functie om ook gebruikt te kunnen worden door 'Terug naar begin'
+        function goToPage(pageNumber) {
+            const flipbook = $('#flipbook');
+            let targetPage;
+
+            if (pageNumber) { // Als een specifiek paginanummer is meegegeven
+                targetPage = pageNumber;
+            } else { // Anders, lees van inputveld
+                const pageInput = document.getElementById("pageSearch");
+                targetPage = parseInt(pageInput.value);
+            }
+
+            if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages) {
+                // Controleer of Turn.js al geïnitialiseerd is voordat je turn('page') aanroept
+                if (flipbook.data('turn-page')) { // Check of Turn.js data is geladen
+                    flipbook.turn('page', targetPage);
+                    // Het omslaggeluid wordt al afgehandeld door het 'turning' event
+                } else {
+                    console.error("Turn.js is nog niet geïnitialiseerd.");
+                }
             }
         }
 
+
         // Functie om de "volledig scherm" modus te togglen
-        function toggleFullscreenLayout(triggeredByClick = false) {
+        // `trigger` kan 'click', 'turn', of 'resize' zijn
+        function updateFullscreenLayout(trigger) {
             const flipbook = $('#flipbook');
             const mainContainer = $('#main-container');
             const header = $('h1');
             const controls = $('#controls');
             const downloadSection = $('#download-section');
+            const root = document.documentElement; // Voor CSS variabelen
 
-            // Bepaal of we de modus UIT moeten zetten
-            if (triggeredByClick && isFullscreenMode) {
-                isFullscreenMode = false;
-            } else if (!isFullscreenMode) { // Anders, zet AAN als het nog niet aanstaat
+            // Update CSS variabelen voor de hoogte van de controls/download sectie
+            root.style.setProperty('--controls-height', `${controls.outerHeight(true)}px`);
+            root.style.setProperty('--download-height', `${downloadSection.outerHeight(true)}px`);
+
+            // Logica voor het wisselen van de fullscreen-modus status
+            if (trigger === 'click') { // Alleen een klik togglet de modus
+                isFullscreenMode = !isFullscreenMode;
+            } else if (trigger === 'turn' && !isFullscreenMode) { // Een 'turn' zet het AAN als het uit staat
                 isFullscreenMode = true;
-            } else { // Als het al aanstaat en niet door een klik wordt uitgeschakeld, doe niets
-                return;
             }
+            // Een 'resize' verandert de modus niet, alleen de grootte
 
             $('body').toggleClass('fullscreen-mode', isFullscreenMode);
 
@@ -266,15 +304,17 @@
                 const viewportWidth = $(window).width();
                 const viewportHeight = $(window).height();
 
-                // Hoogte van zichtbare besturingselementen
+                // Hoogte van zichtbare bedieningselementen
+                // header.is(':visible') zorgt ervoor dat de header alleen meetelt als hij niet verborgen is
                 const currentHeaderHeight = header.is(':visible') ? header.outerHeight(true) : 0;
                 const currentControlsHeight = controls.outerHeight(true);
                 const currentDownloadHeight = downloadSection.outerHeight(true);
 
                 // Ruimte voor marges en padding, en om te voorkomen dat het te krap wordt
-                const verticalBuffer = 60; // Extra ruimte boven/onder
-                const horizontalBuffer = 40; // Extra ruimte links/rechts voor pijlen + marge
+                const verticalBuffer = 20; // Ruimte voor top/bottom marge van main-container
+                const horizontalBuffer = 40; // Ruimte voor pijlen en marges
 
+                // Beschikbare hoogte voor het flipbook
                 const availableHeight = viewportHeight - (currentHeaderHeight + currentControlsHeight + currentDownloadHeight + verticalBuffer);
                 const availableWidth = viewportWidth - horizontalBuffer;
 
@@ -282,37 +322,37 @@
 
                 let newFlipbookWidth, newFlipbookHeight;
 
-                // Bereken de nieuwe grootte op basis van de beschikbare ruimte en de ratio
-                // Prioriteer de hoogte om de hele pagina te vullen
+                // Bereken de nieuwe grootte op basis van beschikbare ruimte en ratio
+                // Probeer eerst de hoogte te vullen
                 newFlipbookHeight = availableHeight;
                 newFlipbookWidth = newFlipbookHeight * originalRatio;
 
-                // Als de berekende breedte te groot is voor de beschikbare breedte, schaal dan op basis van breedte
+                // Als de breedte te groot is, schaal dan op basis van breedte
                 if (newFlipbookWidth > availableWidth) {
                     newFlipbookWidth = availableWidth;
                     newFlipbookHeight = newFlipbookWidth / originalRatio;
                 }
 
-                // Zorg ervoor dat het niet kleiner wordt dan de standaardgrootte, tenzij de viewport echt klein is
-                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth / 2); // Kleinere minimale grootte
-                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight / 2);
+                // Zorg ervoor dat het niet kleiner wordt dan een minimale acceptabele grootte
+                const minScaleFactor = 0.5; // Bijv. minimaal 50% van de standaardgrootte
+                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth * minScaleFactor);
+                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight * minScaleFactor);
 
                 // Pas de afmetingen aan met Turn.js
-                flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
-
-                // Optioneel: pas marges van main-container aan voor een strakker fullscreen beeld
-                mainContainer.css({ 'margin-top': 'auto', 'margin-bottom': 'auto' });
+                // Gebruik setTimeout om te zorgen dat Turn.js correct reageert na DOM updates
+                setTimeout(() => {
+                    flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
+                    // Belangrijk: Turn.js opnieuw centreren NA resizing
+                    flipbook.turn('center');
+                }, 10); // Een kleine delay
 
             } else {
                 // Terug naar standaard maten
-                flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
-
-                // Herstel marges
-                mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
+                setTimeout(() => {
+                    flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
+                    flipbook.turn('center');
+                }, 10);
             }
-
-            // Zorg ervoor dat het flipbook opnieuw wordt gecentreerd na de wijziging
-            flipbook.turn('center');
         }
 
 
@@ -338,26 +378,41 @@
                 autoCenter: true,
                 duration: 600, // Standaard duur van de animatie
                 acceleration: true, // Gebruik hardware acceleratie voor soepelere animaties
+                display: 'double', // Zorg dat altijd dubbele pagina's worden getoond
                 when: {
                     turning: function () {
                         playPageSound();
-                        // Activeer fullscreen mode wanneer een pagina omslaat, tenzij het al aanstaat
-                        // of we het net hebben uitgeschakeld via de knop.
-                        if (!isFullscreenMode) {
-                            toggleFullscreenLayout(false); // false omdat het niet door een klik komt
-                        }
+                        updateFullscreenLayout('turn'); // Activeer/bevestig fullscreen mode bij omslaan
                     },
                     turned: function(event, page, view) {
                         // Zorg ervoor dat de schaal correct is na het omslaan in fullscreen mode
-                        if (isFullscreenMode) {
-                            // setTimeout nodig om Turn.js even de tijd te geven
+                        // Call updateFullscreenLayout om te herberekenen en centreren
+                        updateFullscreenLayout('turned'); // Gebruik 'turned' als trigger
+                        // Als pagina 1 wordt getoond, verberg de 'lege' linkerpagina
+                        if (page === 1) {
+                            $('#flipbook').turn('disable', true); // Tijdelijk uitschakelen om de rendering te beïnvloeden
+                            $('#flipbook').turn('peel', 'br'); // Forceer de render van de voorkant
+                            // Zet disable weer uit, anders werkt omslaan niet
                             setTimeout(() => {
-                                toggleFullscreenLayout(false);
-                            }, 50);
+                                $('#flipbook').turn('disable', false);
+                            }, 100);
+                        }
+                    },
+                    start: function(event, pageObject, corner) {
+                        // Zorgt dat de eerste 'lege' pagina correct wegblijft bij het starten van de flip
+                        if ($(this).turn('page') === 1 && corner === 'tl' || corner === 'bl') {
+                            event.preventDefault(); // Voorkom dat je terugblaad als je op pagina 1 staat
                         }
                     }
                 }
             });
+
+            // Wanneer het boek wordt geopend op pagina 1, direct de styling voor de lege pagina toepassen
+            // Dit kan handmatig worden getriggerd na initialisatie
+            setTimeout(function() {
+                 $('#flipbook').turn('page', 1); // Zorg ervoor dat het boek op pagina 1 start
+            }, 50); // Een kleine delay voor Turn.js om te initialiseren
+
 
             // Pijltjestoetsen
             $(document).keydown(function(e) {
@@ -365,11 +420,15 @@
                 switch (e.key) {
                     case "ArrowLeft":
                         e.preventDefault();
-                        flipbook.turn('previous');
+                        if (flipbook.turn('page') > 1) { // Voorkom terugbladeren voor pagina 1
+                            flipbook.turn('previous');
+                        }
                         break;
                     case "ArrowRight":
                         e.preventDefault();
-                        flipbook.turn('next');
+                        if (flipbook.turn('page') < totalPages) { // Voorkom vooruitbladeren na laatste pagina
+                            flipbook.turn('next');
+                        }
                         break;
                 }
             });
@@ -383,22 +442,30 @@
 
             // Klik op pijltjes
             $('#arrow-left').on('click', function() {
-                $('#flipbook').turn('previous');
+                const flipbook = $('#flipbook');
+                if (flipbook.turn('page') > 1) {
+                    flipbook.turn('previous');
+                }
             });
 
             $('#arrow-right').on('click', function() {
-                $('#flipbook').turn('next');
+                const flipbook = $('#flipbook');
+                if (flipbook.turn('page') < totalPages) {
+                    flipbook.turn('next');
+                }
             });
 
             // Event listener voor de 'Volledig scherm' knop
             $('#toggleFullscreen').on('click', function() {
-                toggleFullscreenLayout(true); // true omdat het door een klik komt
+                updateFullscreenLayout('click');
             });
 
             // Pas de grootte van het flipbook aan als het browservenster verandert
             $(window).resize(function() {
+                // Alleen updaten als we in fullscreen mode zijn, of als we geen fullscreen modus hebben
+                // maar toch de grootte aan moeten passen (minder waarschijnlijk hier)
                 if (isFullscreenMode) {
-                    toggleFullscreenLayout(false); // Niet door een klik, herbereken grootte
+                    updateFullscreenLayout('resize');
                 }
             });
         });
