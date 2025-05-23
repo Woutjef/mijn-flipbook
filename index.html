@@ -23,7 +23,6 @@
             justify-content: center;
             align-items: center;
             margin: 0 auto 20px auto;
-            /* Toegevoegd voor vloeiende overgang van de container zelf */
             transition: margin 0.3s ease;
         }
 
@@ -34,13 +33,10 @@
             border-radius: 12px;
             background: white;
             overflow: hidden;
-            /* Toegevoegd voor vloeiende overgang van het flipbook zelf */
             transition: width 0.3s ease, height 0.3s ease;
         }
 
         .page {
-            /* De Turn.js library bepaalt de breedte van de pagina's binnen het flipbook,
-               dus deze maten zijn de helft van de flipbook breedte/hoogte. */
             width: 480px; /* Breedte van één pagina */
             height: 640px; /* Hoogte van één pagina */
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -58,37 +54,37 @@
         }
 
         .nav-arrow-outside {
-            background-color: rgba(0, 0, 0, 0.1); /* Nog transparanter (was 0.2) */
+            background-color: rgba(0, 0, 0, 0.1); /* Meer transparant */
             border: none;
             color: white;
-            padding: 5px 8px; /* Ongeveer 50% kleiner (was 10px 12px) */
-            font-size: 1.2rem; /* Ongeveer 50% kleiner (was 1.5rem) */
-            border-radius: 6px; /* Iets kleinere radius */
+            padding: 5px 8px; /* Ongeveer 50% kleiner padding */
+            font-size: 1.2rem; /* Ongeveer 50% kleiner font-size */
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            height: 30px; /* Ongeveer 50% kleiner (was 50px) */
+            height: 30px; /* Ongeveer 50% kleiner hoogte */
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0; /* Zorgt ervoor dat pijlen niet kleiner worden in flex container */
+            flex-shrink: 0;
         }
 
         .nav-arrow-outside:hover {
-            background-color: rgba(0, 0, 0, 0.4); /* Donkerder bij hover (was 0.5) */
+            background-color: rgba(0, 0, 0, 0.4); /* Donkerder bij hover */
         }
 
         #arrow-left {
-            margin-right: 10px; /* Afstand tussen linkerpijl en flipbook (was 20px) */
+            margin-right: 10px; /* Afstand tussen linkerpijl en flipbook */
         }
 
         #arrow-right {
-            margin-left: 10px; /* Afstand tussen rechterpijl en flipbook (was 20px) */
+            margin-left: 10px; /* Afstand tussen rechterpijl en flipbook */
         }
 
         #controls {
             text-align: center;
             margin: 20px 0 30px 0;
-            transition: margin 0.3s ease; /* Voor vloeiende overgang indien nodig */
+            transition: margin 0.3s ease;
         }
 
         #controls button {
@@ -117,28 +113,45 @@
             text-align: center;
         }
 
+        #download-section {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85rem; /* Kleinere tekst voor instructie */
+            color: #666; /* Lichtere kleur voor instructie */
+        }
+
+        #download-section a {
+            background-color: #28a745; /* Groen voor download */
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Geen onderstreping */
+            display: inline-block; /* Zodat padding werkt */
+            margin-top: 5px;
+        }
+
+        #download-section a:hover {
+            background-color: #218838;
+        }
+
         /* Fullscreen-achtige modus styles */
         body.fullscreen-mode #main-container {
-            margin: 0 auto; /* Kan de top/bottom margin aanpassen in fullscreen-mode */
-            width: 100%; /* Maakt de container zo breed mogelijk */
-            height: calc(100vh - 120px); /* Neem bijna hele viewport hoogte, minus header/footer */
-            /* Zorgt dat het centraal blijft en niet te breed wordt */
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 120px); /* Meer ruimte voor header/footer */
             max-width: 100%;
         }
 
         body.fullscreen-mode #flipbook {
-            /* Bereken de maximale grootte van het flipbook binnen de viewport
-               De breedte/hoogte ratio van je boek is 960/640 = 1.5 */
-            width: auto; /* Laat de breedte automatisch bepalen door de hoogte */
-            height: calc(100vh - 180px); /* Minder hoogte voor de knoppen/header/footer */
-            max-height: 85vh; /* Maximale hoogte gebaseerd op viewport */
-            max-width: calc(85vh * 1.5); /* Maximale breedte gebaseerd op hoogte en ratio */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* Grotere schaduw in fullscreen-mode */
-        }
-
-        /* Specifieke aanpassing voor Turn.js pagina's in fullscreen-mode */
-        body.fullscreen-mode .page {
-            /* De Turn.js library past de pagina afmetingen intern aan op basis van #flipbook */
+            width: auto;
+            height: calc(100vh - 180px); /* Vulling voor header/footer/controls */
+            max-height: 85vh;
+            max-width: calc(85vh * 1.5); /* Ratio 960/640 = 1.5 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
     </style>
 
@@ -162,6 +175,15 @@
         <label for="pageSearch">🔍 Ga naar pagina:</label>
         <input type="number" id="pageSearch" min="1" max="547" />
         <button onclick="goToPage()">Ga</button>
+    </div>
+
+    <div id="download-section">
+        <p>
+            Klik op de knop hieronder om het volledige Stamboomboek als PDF-bestand te downloaden en op te slaan op uw computer.
+        </p>
+        <a href="Stamboomboek Familie Senders.pdf" download="Stamboomboek Familie Senders.pdf">
+            📥 Download Stamboomboek (PDF)
+        </a>
     </div>
 
     <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
@@ -190,38 +212,44 @@
                 soundActivated = true;
             }).catch(() => {
                 // sommige browsers blokkeren autoplay
+                console.warn("Autoplay van geluid geblokkeerd. Geluid wordt mogelijk niet afgespeeld tenzij de gebruiker interactie heeft gehad.");
             });
-        }
-
-        function goToPage() {
-            const pageInput = document.getElementById("pageSearch");
-            const page = parseInt(pageInput.value);
-            if (!isNaN(page) && page >= 1 && page <= totalPages) {
-                $('#flipbook').turn('page', page);
-                playPageSound();
-            }
         }
 
         // Functie om de "volledig scherm" modus te togglen
         function toggleFullscreenLayout() {
-            isFullscreenMode = !isFullscreenMode; // Toggle de staat
+            // Als we al in fullscreen mode zijn en deze functie wordt handmatig aangeroepen (niet door omslaan),
+            // dan toggelen we het uit. Anders zetten we het altijd aan.
+            const shouldToggleOff = isFullscreenMode && event && event.type === 'click' && event.currentTarget.id === 'toggleFullscreen';
+
+            if (shouldToggleOff) {
+                isFullscreenMode = false;
+            } else {
+                isFullscreenMode = true;
+            }
+
             $('body').toggleClass('fullscreen-mode', isFullscreenMode);
 
             const flipbook = $('#flipbook');
             const mainContainer = $('#main-container');
             const header = $('h1');
             const controls = $('#controls');
+            const downloadSection = $('#download-section'); // De nieuwe download sectie
 
             if (isFullscreenMode) {
                 // Bereken beschikbare ruimte en schaal het flipbook
                 const viewportWidth = $(window).width();
                 const viewportHeight = $(window).height();
 
-                // Houd rekening met de hoogte van de header en controls
-                const headerHeight = header.outerHeight(true);
+                // Hoogte van header en controls (inclusief marges)
+                const headerHeight = header.is(':visible') ? header.outerHeight(true) : 0;
                 const controlsHeight = controls.outerHeight(true);
-                const paddingAndMargins = 60; // Extra ruimte voor marges/padding
-                const availableHeight = viewportHeight - headerHeight - controlsHeight - paddingAndMargins;
+                const downloadHeight = downloadSection.outerHeight(true); // Hoogte van download sectie
+                
+                // Totale verticale ruimte die door elementen ingenomen wordt, excl. flipbook
+                const occupiedVerticalSpace = headerHeight + controlsHeight + downloadHeight + 40; // Extra marge/padding
+
+                const availableHeight = viewportHeight - occupiedVerticalSpace;
 
                 const originalRatio = defaultFlipbookWidth / defaultFlipbookHeight;
 
@@ -229,8 +257,9 @@
                 let newFlipbookWidth = newFlipbookHeight * originalRatio;
 
                 // Als de berekende breedte te groot is voor de viewport, schaal dan op basis van breedte
-                if (newFlipbookWidth > viewportWidth - 200) { // 200px voor pijlen + marge
-                    newFlipbookWidth = viewportWidth - 200;
+                const horizontalPaddingForArrows = 200; // Ruimte voor pijlen en marges
+                if (newFlipbookWidth > viewportWidth - horizontalPaddingForArrows) {
+                    newFlipbookWidth = viewportWidth - horizontalPaddingForArrows;
                     newFlipbookHeight = newFlipbookWidth / originalRatio;
                 }
 
@@ -242,9 +271,9 @@
                 flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
 
                 // Verander de marges van de container om het centraal te houden en strakker te zetten
-                mainContainer.css({ 'margin-top': '20px', 'margin-bottom': '20px' });
+                mainContainer.css({ 'margin-top': '10px', 'margin-bottom': '10px' });
                 header.hide(); // Verberg de titel in fullscreen mode
-                controls.css({'margin-top': '20px', 'margin-bottom': '20px'}); // Pas marges controls aan
+                // De controls blijven zichtbaar, we hoeven hun CSS niet te wijzigen via JS
             } else {
                 // Terug naar standaard maten
                 flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
@@ -252,7 +281,7 @@
                 // Herstel marges
                 mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
                 header.show(); // Toon de titel weer
-                controls.css({'margin-top': '', 'margin-bottom': ''}); // Herstel marges controls
+                // Controls en download sectie herstellen hun standaard marges via CSS
             }
 
             // Zorg ervoor dat het flipbook opnieuw wordt gecentreerd na de wijziging
@@ -280,9 +309,21 @@
                 width: defaultFlipbookWidth,
                 height: defaultFlipbookHeight,
                 autoCenter: true,
+                duration: 600, // Voeg een animatie duur toe (standaard is 600ms)
                 when: {
                     turning: function () {
-                        setTimeout(playPageSound, 100);
+                        // Speel geluid af direct bij het begin van de omslaganimatie
+                        playPageSound();
+                        // Activeer fullscreen mode wanneer een pagina omslaat
+                        if (!isFullscreenMode) { // Alleen aanzetten als het nog niet aanstaat
+                            toggleFullscreenLayout();
+                        }
+                    },
+                    turned: function(event, page, view) {
+                        // Zorg ervoor dat de schaal correct is na het omslaan in fullscreen mode
+                        if (isFullscreenMode) {
+                            toggleFullscreenLayout(); // Herbereken de grootte om de meest optimale fit te garanderen
+                        }
                     }
                 }
             });
@@ -292,16 +333,12 @@
                 const flipbook = $('#flipbook');
                 switch (e.key) {
                     case "ArrowLeft":
-                        setTimeout(() => {
-                            flipbook.turn('previous');
-                        }, 50);
-                        e.preventDefault();
+                        e.preventDefault(); // Voorkom standaard browser scrollgedrag
+                        flipbook.turn('previous');
                         break;
                     case "ArrowRight":
-                        setTimeout(() => {
-                            flipbook.turn('next');
-                        }, 50);
-                        e.preventDefault();
+                        e.preventDefault(); // Voorkom standaard browser scrollgedrag
+                        flipbook.turn('next');
                         break;
                 }
             });
