@@ -87,9 +87,9 @@
             background-color: #ccc;
             color: #222;
             border: none;
-            padding: 6px 10px;
-            margin: 5px;
-            font-size: 0.8rem;
+            padding: 3px 5px;       /* 50% kleiner */
+            margin: 2px;            /* 50% kleiner */
+            font-size: 0.4rem;      /* 50% kleiner */
             border-radius: 4px;
             cursor: pointer;
         }
@@ -109,7 +109,7 @@
         }
 
         #controls label[for="pageSearch"] {
-            font-size: 0.7rem; /* kleiner font voor ‘Pagina:’ */
+            font-size: 0.7rem;
         }
 
         #controls div {
@@ -206,9 +206,4 @@
             });
 
             $('#arrow-right').on('click', function () {
-                $('#flipbook').turn('next');
-            });
-        });
-    </script>
-</body>
-</html>
+                $('#flipbook').turn('n
