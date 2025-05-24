@@ -13,32 +13,30 @@
 
         h1 {
             text-align: center;
-            margin: 20px 0 10px 0;
+            margin: 10px 0;
             font-weight: normal;
-            font-size: 1.2rem; /* 40% kleiner dan 2rem */
+            font-size: 1.2rem; /* ~40% kleiner */
         }
 
         #main-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0 auto 20px auto;
-            transition: margin 0.3s ease;
+            margin: 0 auto 10px auto;
         }
 
         #flipbook {
-            width: 960px;
-            height: 640px;
+            width: 720px; /* kleiner gemaakt */
+            height: 480px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.2);
             border-radius: 12px;
             background: white;
             overflow: hidden;
-            transition: width 0.3s ease, height 0.3s ease;
         }
 
         .page {
-            width: 480px;
-            height: 640px;
+            width: 360px;
+            height: 480px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             border-radius: 8px;
             overflow: hidden;
@@ -61,7 +59,6 @@
             font-size: 0.9rem;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
             height: 24px;
             display: flex;
             align-items: center;
@@ -83,7 +80,7 @@
 
         #controls {
             text-align: center;
-            margin: 15px 0 25px 0;
+            margin: 10px 0 15px 0;
         }
 
         #controls button {
@@ -95,7 +92,6 @@
             font-size: 0.8rem;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         #controls button:hover {
@@ -117,28 +113,13 @@
             margin-top: 4px;
             color: #555;
         }
-
-        body.fullscreen-mode #main-container {
-            margin: 0 auto;
-            width: 100%;
-            height: calc(100vh - 120px);
-            max-width: 100%;
-        }
-
-        body.fullscreen-mode #flipbook {
-            width: auto;
-            height: calc(100vh - 180px);
-            max-height: 85vh;
-            max-width: calc(85vh * 1.5);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="turn.min.js"></script>
 </head>
 <body>
-    <h1 id="page-top">Welkom bij het Stamboomboek van de Familie Senders</h1>
+    <h1>Welkom bij het Stamboomboek van de Familie Senders</h1>
 
     <div id="main-container">
         <button id="arrow-left" class="nav-arrow-outside">←</button>
@@ -147,7 +128,6 @@
     </div>
 
     <div id="controls">
-        <button id="toggleFullscreen">🖥️ Volledig scherm</button>
         <button onclick="$('#flipbook').turn('page', 1)">⏮️ Begin</button>
         <label for="pageSearch">🔍 Pagina:</label>
         <input type="number" id="pageSearch" min="1" max="547" />
@@ -160,14 +140,9 @@
 
     <script>
         const totalPages = 547;
-        const defaultFlipbookWidth = 960;
-        const defaultFlipbookHeight = 640;
-        let soundActivated = false;
-        let isFullscreenMode = false;
 
         function playPageSound() {
             const sound = document.getElementById("pageSound");
-            if (!soundActivated) return;
             sound.currentTime = 0;
             sound.play();
         }
@@ -179,54 +154,57 @@
                 sound.pause();
                 sound.currentTime = 0;
                 sound.volume = 1;
-                soundActivated = true;
             }).catch(() => {});
         }
 
         function goToPage() {
-            const pageInput = document.getElementById("pageSearch");
-            const page = parseInt(pageInput.value);
+            const page = parseInt(document.getElementById("pageSearch").value);
             if (!isNaN(page) && page >= 1 && page <= totalPages) {
                 $('#flipbook').turn('page', page);
                 playPageSound();
             }
         }
 
-        function toggleFullscreenLayout() {
-            isFullscreenMode = !isFullscreenMode;
-            $('body').toggleClass('fullscreen-mode', isFullscreenMode);
+        function downloadPDF() {
+            window.open('Stamboomboek%20Familie%20Senders.pdf', '_blank');
+        }
 
-            const flipbook = $('#flipbook');
-            const mainContainer = $('#main-container');
-            const header = $('h1');
-            const controls = $('#controls');
+        $(document).ready(function () {
+            $(document).one("click keydown", activateSound);
 
-            if (isFullscreenMode) {
-                const viewportWidth = $(window).width();
-                const viewportHeight = $(window).height();
-                const headerHeight = header.outerHeight(true);
-                const controlsHeight = controls.outerHeight(true);
-                const paddingAndMargins = 60;
-                const availableHeight = viewportHeight - headerHeight - controlsHeight - paddingAndMargins;
-                const originalRatio = defaultFlipbookWidth / defaultFlipbookHeight;
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNum = String(i).padStart(3, '0');
+                const pageDiv = $('<div>').addClass('page');
+                const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
+                pageDiv.append(img);
+                $('#flipbook').append(pageDiv);
+            }
 
-                let newFlipbookHeight = availableHeight;
-                let newFlipbookWidth = newFlipbookHeight * originalRatio;
-
-                if (newFlipbookWidth > viewportWidth - 200) {
-                    newFlipbookWidth = viewportWidth - 200;
-                    newFlipbookHeight = newFlipbookWidth / originalRatio;
+            $('#flipbook').turn({
+                width: 720,
+                height: 480,
+                autoCenter: true,
+                when: {
+                    turning: function () {
+                        setTimeout(playPageSound, 100);
+                    }
                 }
+            });
 
-                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth);
-                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight);
+            $('#pageSearch').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    goToPage();
+                }
+            });
 
-                flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
-                mainContainer.css({ 'margin-top': '20px', 'margin-bottom': '20px' });
-                header.hide();
-                controls.css({'margin-top': '20px', 'margin-bottom': '20px'});
-            } else {
-                flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
-                mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
-                header.show();
-                c
+            $('#arrow-left').on('click', function () {
+                $('#flipbook').turn('previous');
+            });
+
+            $('#arrow-right').on('click', function () {
+                $('#flipbook').turn('next');
+            });
+        });
+    </script>
+</body>
+</html>
