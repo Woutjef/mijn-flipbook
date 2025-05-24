@@ -1,163 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Familie Senders – Stamboomboek</title>
+    <style>
+        body {
+            background: #eee;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
 
-h1 {
-text-align: center;
-            margin: 20px 0 10px 0;
+        h1 {
+            text-align: center;
             margin: 10px 0;
-font-weight: normal;
-            font-size: 1.2rem; /* 40% kleiner dan 2rem */
+            font-weight: normal;
             font-size: 1.2rem; /* ~40% kleiner */
-}
+        }
 
-#main-container {
-display: flex;
-justify-content: center;
-align-items: center;
-            margin: 0 auto 20px auto;
-            transition: margin 0.3s ease;
+        #main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin: 0 auto 10px auto;
-}
+        }
 
-#flipbook {
-            width: 960px;
-            height: 640px;
+        #flipbook {
             width: 720px; /* kleiner gemaakt */
             height: 480px;
-box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-border-radius: 12px;
-background: white;
-overflow: hidden;
-            transition: width 0.3s ease, height 0.3s ease;
-}
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            background: white;
+            overflow: hidden;
+        }
 
-.page {
-            width: 480px;
-            height: 640px;
+        .page {
             width: 360px;
             height: 480px;
-box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-border-radius: 8px;
-overflow: hidden;
-@@ -61,7 +59,6 @@
-font-size: 0.9rem;
-border-radius: 6px;
-cursor: pointer;
-            transition: background-color 0.3s ease;
-height: 24px;
-display: flex;
-align-items: center;
-@@ -83,7 +80,7 @@
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+        }
 
-#controls {
-text-align: center;
-            margin: 15px 0 25px 0;
-            margin: 10px 0 15px 0;
-}
-
-#controls button {
-@@ -95,7 +92,6 @@
-font-size: 0.8rem;
-border-radius: 4px;
-cursor: pointer;
-            transition: background-color 0.3s ease;
-}
-
-#controls button:hover {
-@@ -117,28 +113,13 @@
-margin-top: 4px;
-color: #555;
-}
-
-        body.fullscreen-mode #main-container {
-            margin: 0 auto;
+        .page img {
             width: 100%;
-            height: calc(100vh - 120px);
-            max-width: 100%;
+            height: 100%;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
-        body.fullscreen-mode #flipbook {
-            width: auto;
-            height: calc(100vh - 180px);
-            max-height: 85vh;
-            max-width: calc(85vh * 1.5);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        .nav-arrow-outside {
+            background-color: rgba(100, 100, 100, 0.2);
+            border: none;
+            color: #333;
+            padding: 3px 6px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            cursor: pointer;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-</style>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="turn.min.js"></script>
+        .nav-arrow-outside:hover {
+            background-color: rgba(100, 100, 100, 0.4);
+        }
+
+        #arrow-left {
+            margin-right: 10px;
+        }
+
+        #arrow-right {
+            margin-left: 10px;
+        }
+
+        #controls {
+            text-align: center;
+            margin: 10px 0 15px 0;
+        }
+
+        #controls button {
+            background-color: #ccc;
+            color: #222;
+            border: none;
+            padding: 6px 10px;
+            margin: 5px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #controls button:hover {
+            background-color: #aaa;
+        }
+
+        #controls input[type="number"] {
+            padding: 5px;
+            font-size: 0.8rem;
+            width: 60px;
+            margin-left: 5px;
+            border-radius: 4px;
+            border: 1px solid #aaa;
+            text-align: center;
+        }
+
+        #controls div {
+            font-size: 0.65rem;
+            margin-top: 4px;
+            color: #555;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="turn.min.js"></script>
 </head>
 <body>
-    <h1 id="page-top">Welkom bij het Stamboomboek van de Familie Senders</h1>
     <h1>Welkom bij het Stamboomboek van de Familie Senders</h1>
 
-<div id="main-container">
-<button id="arrow-left" class="nav-arrow-outside">←</button>
-@@ -147,7 +128,6 @@ <h1 id="page-top">Welkom bij het Stamboomboek van de Familie Senders</h1>
-</div>
+    <div id="main-container">
+        <button id="arrow-left" class="nav-arrow-outside">←</button>
+        <div id="flipbook"></div>
+        <button id="arrow-right" class="nav-arrow-outside">→</button>
+    </div>
 
-<div id="controls">
-        <button id="toggleFullscreen">🖥️ Volledig scherm</button>
-<button onclick="$('#flipbook').turn('page', 1)">⏮️ Begin</button>
-<label for="pageSearch">🔍 Pagina:</label>
-<input type="number" id="pageSearch" min="1" max="547" />
-@@ -160,14 +140,9 @@ <h1 id="page-top">Welkom bij het Stamboomboek van de Familie Senders</h1>
+    <div id="controls">
+        <button onclick="$('#flipbook').turn('page', 1)">⏮️ Begin</button>
+        <label for="pageSearch">🔍 Pagina:</label>
+        <input type="number" id="pageSearch" min="1" max="547" />
+        <button onclick="goToPage()">Ga</button>
+        <button onclick="downloadPDF()">📥 PDF</button>
+        <div>Klik op PDF om het boek op te slaan op je computer. De bladeranimaties die je hier ziet, werken niet op je eigen computer</div>
+    </div>
 
-<script>
-const totalPages = 547;
-        const defaultFlipbookWidth = 960;
-        const defaultFlipbookHeight = 640;
-        let soundActivated = false;
-        let isFullscreenMode = false;
+    <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
 
-function playPageSound() {
-const sound = document.getElementById("pageSound");
-            if (!soundActivated) return;
-sound.currentTime = 0;
-sound.play();
-}
-@@ -179,54 +154,57 @@ <h1 id="page-top">Welkom bij het Stamboomboek van de Familie Senders</h1>
-sound.pause();
-sound.currentTime = 0;
-sound.volume = 1;
-                soundActivated = true;
-}).catch(() => {});
-}
+    <script>
+        const totalPages = 547;
 
-function goToPage() {
-            const pageInput = document.getElementById("pageSearch");
-            const page = parseInt(pageInput.value);
+        function playPageSound() {
+            const sound = document.getElementById("pageSound");
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function activateSound() {
+            const sound = document.getElementById("pageSound");
+            sound.volume = 0;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = 1;
+            }).catch(() => {});
+        }
+
+        function goToPage() {
             const page = parseInt(document.getElementById("pageSearch").value);
-if (!isNaN(page) && page >= 1 && page <= totalPages) {
-$('#flipbook').turn('page', page);
-playPageSound();
-}
-}
+            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                $('#flipbook').turn('page', page);
+                playPageSound();
+            }
+        }
 
-        function toggleFullscreenLayout() {
-            isFullscreenMode = !isFullscreenMode;
-            $('body').toggleClass('fullscreen-mode', isFullscreenMode);
-
-            const flipbook = $('#flipbook');
-            const mainContainer = $('#main-container');
-            const header = $('h1');
-            const controls = $('#controls');
         function downloadPDF() {
             window.open('Stamboomboek%20Familie%20Senders.pdf', '_blank');
         }
 
-            if (isFullscreenMode) {
-                const viewportWidth = $(window).width();
-                const viewportHeight = $(window).height();
-                const headerHeight = header.outerHeight(true);
-                const controlsHeight = controls.outerHeight(true);
-                const paddingAndMargins = 60;
-                const availableHeight = viewportHeight - headerHeight - controlsHeight - paddingAndMargins;
-                const originalRatio = defaultFlipbookWidth / defaultFlipbookHeight;
         $(document).ready(function () {
             $(document).one("click keydown", activateSound);
 
-                let newFlipbookHeight = availableHeight;
-                let newFlipbookWidth = newFlipbookHeight * originalRatio;
             for (let i = 1; i <= totalPages; i++) {
                 const pageNum = String(i).padStart(3, '0');
                 const pageDiv = $('<div>').addClass('page');
@@ -166,9 +180,6 @@ playPageSound();
                 $('#flipbook').append(pageDiv);
             }
 
-                if (newFlipbookWidth > viewportWidth - 200) {
-                    newFlipbookWidth = viewportWidth - 200;
-                    newFlipbookHeight = newFlipbookWidth / originalRatio;
             $('#flipbook').turn({
                 width: 720,
                 height: 480,
@@ -177,21 +188,9 @@ playPageSound();
                     turning: function () {
                         setTimeout(playPageSound, 100);
                     }
-}
+                }
             });
 
-                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth);
-                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight);
-
-                flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
-                mainContainer.css({ 'margin-top': '20px', 'margin-bottom': '20px' });
-                header.hide();
-                controls.css({'margin-top': '20px', 'margin-bottom': '20px'});
-            } else {
-                flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
-                mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
-                header.show();
-                c
             $('#pageSearch').on('keypress', function (e) {
                 if (e.key === 'Enter') {
                     goToPage();
