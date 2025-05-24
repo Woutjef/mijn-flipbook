@@ -80,4 +80,135 @@
 
         #controls {
             text-align: center;
-            margin:
+            margin: 10px 0 0 0; /* ondermarge nu 0 */
+        }
+
+        #controls button {
+            background-color: #ccc;
+            color: #222;
+            border: none;
+            padding: 6px 10px;
+            margin: 5px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #controls button:hover {
+            background-color: #aaa;
+        }
+
+        #controls input[type="number"] {
+            padding: 5px;
+            font-size: 0.8rem;
+            width: 60px;
+            margin-left: 5px;
+            border-radius: 4px;
+            border: 1px solid #aaa;
+            text-align: center;
+        }
+
+        #controls label[for="pageSearch"] {
+            font-size: 0.7rem; /* kleiner font voor ‘Pagina:’ */
+        }
+
+        #controls div {
+            font-size: 0.65rem;
+            margin-top: 4px;
+            color: #555;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="turn.min.js"></script>
+</head>
+<body>
+    <h1>Welkom bij het Stamboomboek van de Familie Senders</h1>
+
+    <div id="main-container">
+        <button id="arrow-left" class="nav-arrow-outside">←</button>
+        <div id="flipbook"></div>
+        <button id="arrow-right" class="nav-arrow-outside">→</button>
+    </div>
+
+    <div id="controls">
+        <button onclick="$('#flipbook').turn('page', 1)">⏮️ Begin</button>
+        <label for="pageSearch">🔍 Pagina:</label>
+        <input type="number" id="pageSearch" min="1" max="547" />
+        <button onclick="goToPage()">Ga</button>
+        <button onclick="downloadPDF()">📥 PDF</button>
+        <div>Klik op PDF om het boek op te slaan op je computer. De bladeranimaties die je hier ziet, werken niet op je eigen computer</div>
+    </div>
+
+    <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
+
+    <script>
+        const totalPages = 547;
+
+        function playPageSound() {
+            const sound = document.getElementById("pageSound");
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function activateSound() {
+            const sound = document.getElementById("pageSound");
+            sound.volume = 0;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = 1;
+            }).catch(() => {});
+        }
+
+        function goToPage() {
+            const page = parseInt(document.getElementById("pageSearch").value);
+            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                $('#flipbook').turn('page', page);
+                playPageSound();
+            }
+        }
+
+        function downloadPDF() {
+            window.open('Stamboomboek%20Familie%20Senders.pdf', '_blank');
+        }
+
+        $(document).ready(function () {
+            $(document).one("click keydown", activateSound);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNum = String(i).padStart(3, '0');
+                const pageDiv = $('<div>').addClass('page');
+                const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
+                pageDiv.append(img);
+                $('#flipbook').append(pageDiv);
+            }
+
+            $('#flipbook').turn({
+                width: 720,
+                height: 480,
+                autoCenter: true,
+                when: {
+                    turning: function () {
+                        setTimeout(playPageSound, 100);
+                    }
+                }
+            });
+
+            $('#pageSearch').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    goToPage();
+                }
+            });
+
+            $('#arrow-left').on('click', function () {
+                $('#flipbook').turn('previous');
+            });
+
+            $('#arrow-right').on('click', function () {
+                $('#flipbook').turn('next');
+            });
+        });
+    </script>
+</body>
+</html>
