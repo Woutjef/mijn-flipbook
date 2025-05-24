@@ -1,76 +1,311 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stamboomboek Familie Senders</title>
+    <meta charset="utf-8" />
+    <title>Familie Senders – Stamboomboek</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background: #eee;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #333;
         }
-        .content {
-            flex: 1;
+
+        h1 {
+            text-align: center;
+            margin: 20px 0 10px 0;
+            font-weight: normal;
+            font-size: 2rem;
+        }
+
+        #main-container {
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0 auto 20px auto;
+            transition: margin 0.3s ease;
+        }
+
+        #flipbook {
+            width: 960px;
+            height: 640px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            background: white;
+            overflow: hidden;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .page {
+            width: 480px;
+            height: 640px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+        }
+
+        .page img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .nav-arrow-outside {
+            background-color: rgba(0, 0, 0, 0.1);
+            border: none;
+            color: white;
+            padding: 5px 8px;
+            font-size: 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-arrow-outside:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        #arrow-left {
+            margin-right: 10px;
+        }
+
+        #arrow-right {
+            margin-left: 10px;
+        }
+
+        #controls {
+            text-align: center;
+            margin: 20px 0 30px 0;
+            transition: margin 0.3s ease;
+        }
+
+        #controls button {
+            background-color: #007acc;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 0 10px 10px 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #controls button:hover {
+            background-color: #005fa3;
+        }
+
+        #controls input[type="number"] {
+            padding: 10px;
+            font-size: 1rem;
+            width: 80px;
+            margin-left: 10px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
             text-align: center;
         }
-        .controls {
-            display: flex;
-            justify-content: center;
-            padding: 10px;
-            position: relative;
-            bottom: 0;
+
+        body.fullscreen-mode #main-container {
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 120px);
+            max-width: 100%;
         }
-        button {
-            font-size: 0.8em; /* 50% smaller */
-            margin: 5px;
-            padding: 10px 20px;
+
+        body.fullscreen-mode #flipbook {
+            width: auto;
+            height: calc(100vh - 180px);
+            max-height: 85vh;
+            max-width: calc(85vh * 1.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
-        .instruction {
-            font-size: 0.7em; /* Kleinere tekst voor instructies */
-            margin-top: 10px;
+
+        body.fullscreen-mode .page {
+            /* turn.js past dit aan */
         }
     </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="turn.min.js"></script>
 </head>
 <body>
+    <h1>Stamboomboek Familie Senders</h1>
 
-<div class="content">
-    <h1>Welkom bij het Stamboomboek Familie Senders</h1>
-    <!-- Hier kan de inhoud van het flipboek komen -->
-</div>
+    <div id="main-container">
+        <button id="arrow-left" class="nav-arrow-outside">←</button>
+        <div id="flipbook"></div>
+        <button id="arrow-right" class="nav-arrow-outside">→</button>
+    </div>
 
-<div class="controls">
-    <button onclick="previousPage()">Vorige</button>
-    <button onclick="nextPage()">Volgende</button>
-    <button onclick="downloadPDF()">Download Flipboek</button>
-</div>
+    <div id="controls">
+        <button id="toggleFullscreen">🖥️ Volledig scherm</button>
+        <button onclick="$('#flipbook').turn('page', 1)">⏮️ Terug naar begin</button>
 
-<p class="instruction">klik op de knop om het flipboek te downloaden en op te slaan als een PDF op uw computer.</p>
+        <label for="pageSearch">🔍 Ga naar pagina:</label>
+        <input type="number" id="pageSearch" min="1" max="547" />
+        <button onclick="goToPage()">Ga</button>
 
-<script>
-    function previousPage() {
-        // Logica voor vorige pagina
-    }
+        <button onclick="downloadPDF()">📥 Download als PDF</button>
+        <div style="font-size: 0.75rem; margin-top: 8px; color: #555;">
+            Klik op deze knop om het hele boek op te slaan als een normale PDF op uw computer.
+        </div>
+    </div>
 
-    function nextPage() {
-        // Logica voor volgende pagina
-    }
+    <audio id="pageSound" src="paginageluid.mp3" preload="auto"></audio>
 
-    function downloadPDF() {
-        const link = document.createElement('a');
-        link.href = 'Stamboomboek Familie Senders.pdf'; // Zorg ervoor dat het pad naar het PDF-bestand correct is
-        link.download = 'Stamboomboek Familie Senders.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-</script>
+    <script>
+        const totalPages = 547;
+        const defaultFlipbookWidth = 960;
+        const defaultFlipbookHeight = 640;
+        let soundActivated = false;
+        let isFullscreenMode = false;
 
+        function playPageSound() {
+            const sound = document.getElementById("pageSound");
+            if (!soundActivated) return;
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function activateSound() {
+            const sound = document.getElementById("pageSound");
+            sound.volume = 0;
+            sound.play().then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = 1;
+                soundActivated = true;
+            }).catch(() => {});
+        }
+
+        function goToPage() {
+            const pageInput = document.getElementById("pageSearch");
+            const page = parseInt(pageInput.value);
+            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                $('#flipbook').turn('page', page);
+                playPageSound();
+            }
+        }
+
+        function toggleFullscreenLayout() {
+            isFullscreenMode = !isFullscreenMode;
+            $('body').toggleClass('fullscreen-mode', isFullscreenMode);
+
+            const flipbook = $('#flipbook');
+            const mainContainer = $('#main-container');
+            const header = $('h1');
+            const controls = $('#controls');
+
+            if (isFullscreenMode) {
+                const viewportWidth = $(window).width();
+                const viewportHeight = $(window).height();
+                const headerHeight = header.outerHeight(true);
+                const controlsHeight = controls.outerHeight(true);
+                const paddingAndMargins = 60;
+                const availableHeight = viewportHeight - headerHeight - controlsHeight - paddingAndMargins;
+                const originalRatio = defaultFlipbookWidth / defaultFlipbookHeight;
+
+                let newFlipbookHeight = availableHeight;
+                let newFlipbookWidth = newFlipbookHeight * originalRatio;
+
+                if (newFlipbookWidth > viewportWidth - 200) {
+                    newFlipbookWidth = viewportWidth - 200;
+                    newFlipbookHeight = newFlipbookWidth / originalRatio;
+                }
+
+                newFlipbookWidth = Math.max(newFlipbookWidth, defaultFlipbookWidth);
+                newFlipbookHeight = Math.max(newFlipbookHeight, defaultFlipbookHeight);
+
+                flipbook.turn('size', newFlipbookWidth, newFlipbookHeight);
+                mainContainer.css({ 'margin-top': '20px', 'margin-bottom': '20px' });
+                header.hide();
+                controls.css({'margin-top': '20px', 'margin-bottom': '20px'});
+            } else {
+                flipbook.turn('size', defaultFlipbookWidth, defaultFlipbookHeight);
+                mainContainer.css({ 'margin-top': '', 'margin-bottom': '' });
+                header.show();
+                controls.css({'margin-top': '', 'margin-bottom': ''});
+            }
+
+            flipbook.turn('center');
+        }
+
+        function downloadPDF() {
+            window.open('Stamboomboek%20Familie%20Senders.pdf', '_blank');
+        }
+
+        $(document).ready(function () {
+            $(document).one("click keydown", function () {
+                activateSound();
+            });
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNum = String(i).padStart(3, '0');
+                const pageDiv = $('<div>').addClass('page');
+                const img = $('<img>').attr('src', `pages/page_${pageNum}.jpg`);
+                pageDiv.append(img);
+                $('#flipbook').append(pageDiv);
+            }
+
+            $('#flipbook').turn({
+                width: defaultFlipbookWidth,
+                height: defaultFlipbookHeight,
+                autoCenter: true,
+                when: {
+                    turning: function () {
+                        setTimeout(playPageSound, 100);
+                    }
+                }
+            });
+
+            $(document).keydown(function(e) {
+                const flipbook = $('#flipbook');
+                switch (e.key) {
+                    case "ArrowLeft":
+                        setTimeout(() => {
+                            flipbook.turn('previous');
+                        }, 50);
+                        e.preventDefault();
+                        break;
+                    case "ArrowRight":
+                        setTimeout(() => {
+                            flipbook.turn('next');
+                        }, 50);
+                        e.preventDefault();
+                        break;
+                }
+            });
+
+            $('#pageSearch').on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    goToPage();
+                }
+            });
+
+            $('#arrow-left').on('click', function() {
+                $('#flipbook').turn('previous');
+            });
+
+            $('#arrow-right').on('click', function() {
+                $('#flipbook').turn('next');
+            });
+
+            $('#toggleFullscreen').on('click', toggleFullscreenLayout);
+
+            $(window).resize(function() {
+                if (isFullscreenMode) {
+                    toggleFullscreenLayout();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
